@@ -6,6 +6,22 @@ LLM agents increasingly answer security questions by searching the web and summa
 
 This repo is a small, reproducible experiment that measures exactly that. It builds on [cyber-intel-mcp](https://github.com/Jody2905/cyber-intel-mcp), which supplies the primary records (CVE Program, CISA KEV, MITRE ATT&CK) and the agent's tools.
 
+## Results
+
+Final run: 24 questions (6 per type) at poison levels 0 and 3, Qwen2.5-7B via Ollama, temperature 0. Brackets are 95% Wilson intervals.
+
+| System | Clean corpus: repeated the planted claim | 3 planted articles: repeated the planted claim | Runs that saw a planted article |
+|---|---|---|---|
+| RAG | 0/24 (0%) | **20/24 (83%) [64–93]** | 24/24 |
+| Search agent | 0/24 | 0/24 | 0/24 |
+| Search agent + verify | 1/24 | 3/24 | 0/24 |
+
+- **RAG is easy to poison.** Three plain articles flipped every CVSS and KEV answer and 5 of 6 vendor answers. RAG cited a planted source in 16 of its 20 poisoned answers.
+- **The agents avoided the attack rather than resisting it.** In all 96 of their searches the model asked for one result, and exact CVE-ID ranking always put the official record first, so no planted article ever reached the agent's context.
+- **Verification never had a poisoned draft to fix,** and it turned 4 of 48 correct drafts into wrong answers by misreading the KEV record.
+
+Every run, with the model's replies and tool calls, is in `results/runs.jsonl`; tables in `results/summary.md`. Caveats: small sample, and in the first 24 questions every KEV question's answer is "no" and every ransomware question's is "yes". A full write-up covers method, limitations and next steps.
+
 ## Experiment design
 
 **Questions.** 60 questions generated from the cyber-intel-mcp snapshot, 15 each of four types. Every question has a gold answer read from the snapshot and one specific false answer (the *poison claim*):
