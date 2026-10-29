@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-poisoning-eval"
+version = "0.1.0"
+description = "Do planted narratives hijack LLM research agents? A poisoning experiment on top of cyber-intel-mcp."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Jody-Ann Trimmingham" }]
+# cyber-intel-mcp is installed separately from your local clone (see README).
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+charts = ["matplotlib>=3.7"]
+
+[project.scripts]
+poison-questions = "poison_eval.questions:main"
+poison-run = "poison_eval.run:main"
+poison-summarize = "poison_eval.summarize:main"
+poison-rescore = "poison_eval.rescore:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/poison_eval"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
